@@ -6,13 +6,27 @@ import streamlit as st
 import matplotlib.pyplot as plt
 
 from pipeline import run_pipeline
+from pathlib import Path
 
 st.set_page_config(page_title="Mini Pipeline", page_icon="📈", layout="wide")
 st.title("Mini Data Pipeline & Analytics Demo")
 
+def discover_tickers(data_dir: str = "data") -> list[str]:
+    p = Path(data_dir)
+    if not p.exists():
+        return []
+    return sorted([f.stem.upper() for f in p.glob("*.csv")])
+
+AVAILABLE_TICKERS = discover_tickers()
+
 with st.sidebar:
     st.header("Run Pipeline")
-    tickers = st.text_input("Tickers (comma-separated)", value="RY.TO,TD.TO")
+    # Multi-select for pipeline
+    sel_tickers = st.multiselect(
+        "Tickers",
+        options=AVAILABLE_TICKERS,
+        help="Choose one or more tickers to load/process",
+    )
     default_start = (date.today() - timedelta(days=90))
     start = st.date_input("Start date", value=default_start)
     end = st.date_input("End date", value=date.today())
@@ -20,16 +34,20 @@ with st.sidebar:
     run_btn = st.button("Run")
 
 if run_btn:
-    with st.spinner("Running pipeline"):
-        summary, counts = run_pipeline(
-            tickers=tickers,
-            start=start.isoformat(),
-            end=end.isoformat(),
-            db_path=db_path,
-        )
-    st.success("Loaded: " + ", ".join([f"{t}:{n}" for t, n in counts]))
-    st.session_state["db_path"] = db_path
-    st.session_state["last_summary"] = summary
+    if not sel_tickers:
+        st.warning("Please select at least one ticker.")
+    else:
+        with st.spinner("Running pipeline"):
+            summary, counts = run_pipeline(
+                tickers=",".join(sel_tickers),      
+                start=start.isoformat(),
+                end=end.isoformat(),
+                db_path=db_path,
+            )
+        st.success("Loaded: " + ", ".join([f"{t}:{n}" for t, n in counts]))
+        st.session_state["db_path"] = db_path
+        st.session_state["last_summary"] = summary
+        st.session_state["last_selected_tickers"] = sel_tickers
 
 
 # Show summary if available
@@ -44,7 +62,22 @@ else:
 
 # Simple chart: pick a ticker and plot price vs MAs
 st.subheader("Chart: Price & Moving Averages")
-sel_ticker = st.text_input("Ticker to chart", value="RY.TO")
+
+# use the latest user selection if available
+loaded_tickers = st.session_state.get("last_selected_tickers", [])
+
+if not loaded_tickers:
+    st.info("Select tickers in the sidebar and click Run to enable charting.")
+else:
+    # default to the first loaded ticker
+    default_chart_ticker = loaded_tickers[0]
+    sel_ticker = st.selectbox(
+        "Ticker to chart",
+        options=loaded_tickers,
+        index=0,
+        help="Only tickers you just loaded are available here."
+    )
+
 if st.button("Show Chart"):
     try:
         con = sqlite3.connect(db_path)
