@@ -51,9 +51,9 @@ def init_db(db_path: str) -> sqlite3.Connection:
     return con
 
 def seed_df_from_static(ticker: str, start: str, end: str) -> pd.DataFrame:
-    """Load a single ticker's CSV from data/{ticker}.csv and filter to [start, end]."""
+    """Load a single ticker's CSV from src/data/{ticker}.csv and filter to [start, end]."""
     import os
-    path = f"data/{ticker}.csv"
+    path = f"src/data/{ticker}.csv"
     if not os.path.exists(path):
         raise FileNotFoundError(f"No static CSV found at {path}")
     df = pd.read_csv(path, parse_dates=["Date"]).rename(columns={
