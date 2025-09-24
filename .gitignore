@@ -1,0 +1,42 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pkl
+*.pytorch
+
+# Virtual environments
+.venv/
+env/
+venv/
+ENV/
+
+# Jupyter / Streamlit
+.ipynb_checkpoints/
+.streamlit/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# SQLite databases (local state)
+*.db
+
+# Logs
+*.log
+
+# Docker artifacts
+*.tar
+*.img
+*.pid
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+
+# Secrets / configs (if added later)
+*.env
+.envrc
+secrets.*
