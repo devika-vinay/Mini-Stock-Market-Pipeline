@@ -7,18 +7,20 @@ import matplotlib.pyplot as plt
 
 from pipeline import run_pipeline
 import os
+from pathlib import Path
+
+# Force CWD to the repo root (one level above /src)
+REPO_ROOT = Path(__file__).resolve().parents[1]
+os.chdir(REPO_ROOT)
 
 st.set_page_config(page_title="Mini Pipeline", page_icon="📈", layout="wide")
 st.title("Mini Data Pipeline & Analytics Demo")
 
 def discover_tickers() -> list[str]:
-    # Construct absolute path based on current file location
-    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    data_dir = os.path.join(base_dir, "data")
-
-    if not os.path.exists(data_dir):
+    data_dir = Path("data")
+    if not data_dir.exists():
         return []
-    return sorted([os.path.splitext(f)[0].upper() for f in os.listdir(data_dir) if f.endswith(".csv")])
+    return sorted(p.stem.upper() for p in data_dir.glob("*.csv"))
 
 AVAILABLE_TICKERS = discover_tickers()
 
