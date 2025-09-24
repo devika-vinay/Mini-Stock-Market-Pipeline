@@ -4,8 +4,17 @@ An end-to-end mini project:
 - ETL from prepackaged synthetic CSVs
 - Feature engineering (returns, MA20/MA50, rolling vol)
 - SQLite warehouse table 
-- Streamlit UI for inputs, table & chart
 - Docker for containerization
+- Streamlit UI for inputs, table & chart
+
+
+## Quickstart (Deployed)
+- Open link: https://mini-stock-market-pipeline.streamlit.app/
+- Choose ticker names from dropdown
+- Choose timeframe for analysis
+- Choose between individual tickers to get visualizations
+- Export summary csv
+
 
 ## Quickstart (Local)
 ```bash
