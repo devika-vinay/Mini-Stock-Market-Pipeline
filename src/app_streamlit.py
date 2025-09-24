@@ -6,27 +6,16 @@ import streamlit as st
 import matplotlib.pyplot as plt
 
 from pipeline import run_pipeline
-import os
-from pathlib import Path
-
-# Force CWD to the repo root (one level above /src)
-REPO_ROOT = Path(__file__).resolve().parents[1]
-os.chdir(REPO_ROOT)
 
 st.set_page_config(page_title="Mini Pipeline", page_icon="📈", layout="wide")
 st.title("Mini Data Pipeline & Analytics Demo")
 
-def discover_tickers() -> list[str]:
-    data_dir = Path("data")
-    if not data_dir.exists():
-        return []
-    return sorted(p.stem.upper() for p in data_dir.glob("*.csv"))
-
-AVAILABLE_TICKERS = discover_tickers()
+AVAILABLE_TICKERS = [
+    "RY.TO", "TD.TO", "BMO.TO", "BNS.TO", "CM.TO", "NA.TO", "XIU.TO"
+]
 
 with st.sidebar:
     st.header("Run Pipeline")
-    # Multi-select for pipeline
     sel_tickers = st.multiselect(
         "Tickers",
         options=AVAILABLE_TICKERS,
@@ -44,7 +33,7 @@ if run_btn:
     else:
         with st.spinner("Running pipeline"):
             summary, counts = run_pipeline(
-                tickers=",".join(sel_tickers),      
+                tickers=",".join(sel_tickers),  # <— pass the chosen list
                 start=start.isoformat(),
                 end=end.isoformat(),
                 db_path=db_path,
@@ -67,42 +56,36 @@ else:
 
 # Simple chart: pick a ticker and plot price vs MAs
 st.subheader("Chart: Price & Moving Averages")
-
-# use the latest user selection if available
 loaded_tickers = st.session_state.get("last_selected_tickers", [])
 
 if not loaded_tickers:
     st.info("Select tickers in the sidebar and click Run to enable charting.")
 else:
-    # default to the first loaded ticker
-    default_chart_ticker = loaded_tickers[0]
     sel_ticker = st.selectbox(
         "Ticker to chart",
-        options=loaded_tickers,
+        options=loaded_tickers,  # <— only user selection
         index=0,
-        help="Only tickers you just loaded are available here."
     )
-
-if st.button("Show Chart"):
-    try:
-        con = sqlite3.connect(db_path)
-        df = pd.read_sql_query(
-            "SELECT date, adj_close, ma_20, ma_50 FROM prices WHERE ticker=? ORDER BY date;",
-            con, params=[sel_ticker]
-        )
-        con.close()
-        if df.empty:
-            st.warning("No data for that ticker. Try running the pipeline or another ticker.")
-        else:
-            df["date"] = pd.to_datetime(df["date"])
-            fig = plt.figure()
-            plt.plot(df["date"], df["adj_close"], label="Adj Close")
-            plt.plot(df["date"], df["ma_20"], label="MA20")
-            plt.plot(df["date"], df["ma_50"], label="MA50")
-            plt.legend(); plt.title(f"{sel_ticker} — Price & MAs")
-            st.pyplot(fig)
-    except Exception as e:
-        st.error(f"Chart error: {e}")
+    if st.button("Show Chart"):
+        try:
+            con = sqlite3.connect(db_path)
+            df = pd.read_sql_query(
+                "SELECT date, adj_close, ma_20, ma_50 FROM prices WHERE ticker=? ORDER BY date;",
+                con, params=[sel_ticker]
+            )
+            con.close()
+            if df.empty:
+                st.warning("No data for that ticker. Try running the pipeline or another ticker.")
+            else:
+                df["date"] = pd.to_datetime(df["date"])
+                fig = plt.figure()
+                plt.plot(df["date"], df["adj_close"], label="Adj Close")
+                plt.plot(df["date"], df["ma_20"], label="MA20")
+                plt.plot(df["date"], df["ma_50"], label="MA50")
+                plt.legend(); plt.title(f"{sel_ticker} — Price & MAs")
+                st.pyplot(fig)
+        except Exception as e:
+            st.error(f"Chart error: {e}")
 
 # Optional: export summary
 if summary is not None and not summary.empty:
