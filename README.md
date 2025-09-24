@@ -1,4 +1,4 @@
-# Mini Data Pipeline & Analytics Demo (Static Datasets)
+# Mini Stocks Analytics
 
 An end-to-end mini project:
 - ETL from prepackaged synthetic CSVs
