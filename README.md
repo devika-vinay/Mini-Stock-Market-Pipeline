@@ -24,7 +24,7 @@ docker run --rm -p 8501:8501 mini-pipeline-ui
 ## What This Demonstrates 
 
 - **Pipelines & ETL**: repeatable UI to ingest, transform, and load curated tables.
-- **Data quality**: defensive checks (no data -> fail fast), derived metrics.
-- **DevEx**: Docker image, CLI args, logging, unit test.
-- **Analytics**: volatility, MA crossovers, Sharpe-friendly features.
+- **Data quality**: defensive checks (no data -> fail), derived metrics.
+- **DevEx**: Docker image, logging, unit test.
+- **Analytics**: volatility, MA crossovers.
 - **BI**: quick charts and an easy path to Tableau/Looker Studio via SQLite export.
