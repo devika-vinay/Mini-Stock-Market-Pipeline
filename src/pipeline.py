@@ -12,6 +12,7 @@ import os
 import pandas as pd
 import numpy as np
 from datetime import datetime
+from pathlib import Path
 
 
 DB_SCHEMA = {
@@ -52,10 +53,12 @@ def init_db(db_path: str) -> sqlite3.Connection:
 
 def seed_df_from_static(ticker: str, start: str, end: str) -> pd.DataFrame:
     """Load a single ticker's CSV from src/data/{ticker}.csv and filter to [start, end]."""
-    import os
-    path = f"src/data/{ticker}.csv"
-    if not os.path.exists(path):
+    base_dir = Path(__file__).resolve().parent          # …/src
+    path = base_dir / "data" / f"{ticker}.csv"          # …/src/data/{ticker}.csv
+
+    if not path.exists():
         raise FileNotFoundError(f"No static CSV found at {path}")
+
     df = pd.read_csv(path, parse_dates=["Date"]).rename(columns={
         "Date":"date","Open":"open","High":"high","Low":"low",
         "Close":"close","Adj Close":"adj_close","Volume":"volume"
