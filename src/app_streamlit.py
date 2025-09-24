@@ -6,16 +6,19 @@ import streamlit as st
 import matplotlib.pyplot as plt
 
 from pipeline import run_pipeline
-from pathlib import Path
+import os
 
 st.set_page_config(page_title="Mini Pipeline", page_icon="📈", layout="wide")
 st.title("Mini Data Pipeline & Analytics Demo")
 
-def discover_tickers(data_dir: str = "data") -> list[str]:
-    p = Path(data_dir)
-    if not p.exists():
+def discover_tickers() -> list[str]:
+    # Construct absolute path based on current file location
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    data_dir = os.path.join(base_dir, "data")
+
+    if not os.path.exists(data_dir):
         return []
-    return sorted([f.stem.upper() for f in p.glob("*.csv")])
+    return sorted([os.path.splitext(f)[0].upper() for f in os.listdir(data_dir) if f.endswith(".csv")])
 
 AVAILABLE_TICKERS = discover_tickers()
 
