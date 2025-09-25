@@ -28,17 +28,6 @@ DB_SCHEMA = {
             PRIMARY KEY (ticker, date)
         );
     """,
-    "news_sentiment": """
-        CREATE TABLE IF NOT EXISTS news_sentiment (
-            ticker TEXT NOT NULL,
-            published TEXT NOT NULL,
-            headline TEXT NOT NULL,
-            sentiment_label TEXT,
-            sentiment_score REAL,
-            created_at TEXT NOT NULL,
-            PRIMARY KEY (ticker, published, headline)
-        );
-    """,
 }
 
 def init_db(db_path: str) -> sqlite3.Connection:
