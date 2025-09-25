@@ -1,10 +1,8 @@
 """
 Mini Data Pipeline
 - Pulls OHLCV data for one or more tickers from Yahoo Finance
-- Computes returns & risk metrics
-- Optionally scores recent news headlines with sentiment
+- Computes returns
 - Loads curated tables into SQLite
-- Provides a tiny CLI to run end-to-end
 """
 import logging
 import sqlite3
